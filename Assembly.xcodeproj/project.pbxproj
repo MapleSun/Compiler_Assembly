@@ -23,8 +23,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F52D0D561CDBCEE2003C8E23 /* test.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
+		F52D0D571CDBCEEB003C8E23 /* result.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = result.txt; sourceTree = "<group>"; };
 		F5FF2B6B1CDBCDD000732BB0 /* Assembly */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Assembly; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5FF2B6E1CDBCDD000732BB0 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		F5FF2B751CDBCE0B00732BB0 /* Rules.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Rules.h; sourceTree = "<group>"; };
+		F5FF2B761CDBCE1900732BB0 /* lexer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lexer.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +62,10 @@
 			isa = PBXGroup;
 			children = (
 				F5FF2B6E1CDBCDD000732BB0 /* main.cpp */,
+				F5FF2B751CDBCE0B00732BB0 /* Rules.h */,
+				F5FF2B761CDBCE1900732BB0 /* lexer.h */,
+				F52D0D561CDBCEE2003C8E23 /* test.txt */,
+				F52D0D571CDBCEEB003C8E23 /* result.txt */,
 			);
 			path = Assembly;
 			sourceTree = "<group>";
@@ -239,6 +247,7 @@
 				F5FF2B741CDBCDD000732BB0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
