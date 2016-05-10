@@ -24,6 +24,8 @@ int main(int argc, const char * argv[]) {
     Parser Parser(in_file, out_file);
     
     Parser.Rat16S();
+    display_Instr();
+    display_Symbol();
     //Parser.Statement();
     
     

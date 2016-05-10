@@ -18,6 +18,7 @@ using namespace std;
 struct token{
     string type;
     string content;
+    int Addr;
 };
 
 // character can be solved by FSM

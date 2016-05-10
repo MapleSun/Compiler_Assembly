@@ -1,0 +1,48 @@
+        <Opt Function Definitions> -> <Empty>
+Token: Seperator             Lexeme: $$
+Token: Keyword               Lexeme: integer
+        <Opt Declaration List> -> <Declaration List>
+        <DeclarationList> -> <Declaration>;<DLPrime>
+        <Declaration> -> <Qualifier> <IDs>
+Token: Keyword               Lexeme: integer
+        <Qualifier> -> integer
+        <IDs> -> <Identifier> <IDsPrime>
+        <Identifier> -> i
+Token: identifier            Lexeme: i
+Token: Seperator             Lexeme: ,
+        <IDsPrime> -> <IDs>
+        <IDs> -> <Identifier> <IDsPrime>
+        <Identifier> -> max
+Token: identifier            Lexeme: max
+Token: Seperator             Lexeme: ,
+        <IDsPrime> -> <IDs>
+        <IDs> -> <Identifier> <IDsPrime>
+        <Identifier> -> sum
+Token: identifier            Lexeme: sum
+        <IDsPrime> -> <Empty>
+Token: Seperator             Lexeme: ;
+        <DLPrime> -> <DeclartionList>
+        <DeclarationList> -> <Declaration>;<DLPrime>
+        <Declaration> -> <Qualifier> <IDs>
+Token: Keyword               Lexeme: boolean
+        <Qualifier> -> boolean
+        <IDs> -> <Identifier> <IDsPrime>
+        <Identifier> -> flag
+Token: identifier            Lexeme: flag
+        <IDsPrime> -> <Empty>
+Token: Seperator             Lexeme: ;
+        <DLPrime> -> <Empty>
+Token: Seperator             Lexeme: $$
+        <StatementList> -> <Statement><SLPrime>
+        <Statement> -> <Read>
+        <Read> -> scanf <IDs>
+Token: Keyword               Lexeme: scanf
+Token: Seperator             Lexeme: (
+        <IDs> -> <Identifier> <IDsPrime>
+        <Identifier> -> i
+Token: identifier            Lexeme: i
+        <IDsPrime> -> <Empty>
+Token: Seperator             Lexeme: )
+Token: Seperator             Lexeme: ;
+        <SLPrime> -> <Empty>
+Token: Seperator             Lexeme: $$

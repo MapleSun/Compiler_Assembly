@@ -1,0 +1,7 @@
+
+$$
+integer i,max,sum;
+boolean flag;
+$$
+scanf(i);
+$$

@@ -12,7 +12,10 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <stack>
 #include "lexer.h"
+#include "Assembly.h"
+
 using namespace std;
 
 
@@ -65,13 +68,93 @@ void Integer();
 
 
 
+vector<INSTR> INSTR_TABLE;
+vector<SYMBOL> Symbol_Table;
+stack<int> jumpstack;
+bool OpSign = false;
+bool Declarating = true;
+string DataType;
+
+int Instr_Addr = 1;
+int Memory_Location = 5000;
+void gen_instr(string OP, int oprnd){
+    int size = INSTR_TABLE.size();
+    if(oprnd == -999){
+        OpSign = true;
+    }
+    
+
+    if(OpSign && INSTR_TABLE[size-1].OP == "JUMPZ"){
+        INSTR Jumpz = INSTR_TABLE[size-1];
+        INSTR_TABLE.pop_back();
+        INSTR Op = INSTR_TABLE[size-2];
+        INSTR_TABLE.pop_back();
+        INSTR_TABLE.push_back(INSTR(Instr_Addr,OP,oprnd));
+        INSTR_TABLE.push_back(Op);
+        INSTR_TABLE.push_back(Jumpz);
+        OpSign = false;
+    }else{
+        INSTR_TABLE.push_back(INSTR(Instr_Addr,OP,oprnd));
+    }
+    Instr_Addr++;
+}
+
+
+void display_Instr(){
+    for (int i = 1; i<=INSTR_TABLE.size()-1; i++){
+        cout <<setw(5) << i;
+        INSTR_TABLE[i].display();
+    }
+}
+
+void display_Symbol(){
+    for (int i = 0; i<=Symbol_Table.size()-1; i++){
+        Symbol_Table[i].display();
+    }
+}
+
+
+void gen_SymbolTable(token Declaration){
+    for (vector<SYMBOL>::iterator it = Symbol_Table.begin(); it != Symbol_Table.end(); ++it){
+        if(Declaration.content == it->Ident){
+            return;
+        }
+    }
+    Symbol_Table.push_back(SYMBOL(Declaration.content,Memory_Location++,DataType));
+}
+
+
+int get_address(token token){
+    for (vector<SYMBOL>::iterator it = Symbol_Table.begin(); it != Symbol_Table.end(); ++it){
+        if(token.content == it->Ident){
+            return it->MemoryLoc;
+        }
+    }
+    cout << "Does not exist" << endl;
+    return -1;
+}
+
+void back_patch(int jump_addr){
+    int jump_Cmd = jumpstack.top();
+    jumpstack.pop();
+    INSTR_TABLE[jump_Cmd+1].oprnd = jump_addr;
+}
+
+
 
 class Parser{
 private:
     fstream inFile, outFile;
     struct token TOKEN;
+    struct token SAVE;
     ostream& OS = outFile;
-    bool SyntaxOut = false;
+    bool SyntaxOut = true;
+    
+    
+    
+    
+ 
+    
     
 public:
     void printTOKEN(){
@@ -110,6 +193,7 @@ public:
         /*cout <<setw(WIDTH)<< "" << lhs << " -> " << rhs << endl;*/
     }
     void Rat16S(){
+        INSTR_TABLE.push_back(INSTR(0,"null",0));
         OptFunctionDefinitions();
         TakeToken();
         if(TOKEN.content == "$$"){
@@ -117,6 +201,7 @@ public:
             OptDeclarationList();
             TakeToken();
             if(TOKEN.content == "$$"){
+                Declarating = false;
                 printTOKEN();
                 StatementList();
                 TakeToken();
@@ -287,6 +372,7 @@ public:
     void OptDeclarationList(){
         TakeToken();
         if(TOKEN.content =="integer" || TOKEN.content == "boolean" || TOKEN.content == "real"){
+            DataType = TOKEN.content;
             printTOKEN();
             putback();
             PrintParseInfo(OS, "<Opt Declaration List>", "<Declaration List>");
@@ -312,6 +398,7 @@ public:
     void DLPrime(){
         TakeToken();
         if(TOKEN.content == "integer" || TOKEN.content == "boolean" || TOKEN.content == "real"){
+            DataType = TOKEN.content;
             putback();
             PrintParseInfo(OS, "<DLPrime>", "<DeclartionList>");
             DeclarationList();
@@ -433,11 +520,14 @@ public:
         TakeToken();
         if(TOKEN.type == "identifier"){
             putback();
+            SAVE = TOKEN;
             Identifier();
             TakeToken();
             if(TOKEN.content ==":="){
                 printTOKEN();
                 Expression();
+                Memory_Location = get_address(SAVE);
+                gen_instr("POPM", Memory_Location);
                 TakeToken();
                 printTOKEN();
                 if(TOKEN.content != ";"){
@@ -455,6 +545,7 @@ public:
         PrintParseInfo(OS, "<If>", "if (<Condition>) <Statement> <IfPrime");
         TakeToken();
         if(TOKEN.content == "if"){
+            //Addr = get_address(TOKEN);
             printTOKEN();
             TakeToken();
             if(TOKEN.content == "("){
@@ -464,6 +555,7 @@ public:
                 if(TOKEN.content == ")"){
                     printTOKEN();
                     Statement();
+                    back_patch(Instr_Addr);
                     IfPrime();
                 }else{
                     ERROR();
@@ -484,6 +576,7 @@ public:
         if(TOKEN.content =="endif"){
             printTOKEN();
             PrintParseInfo(OS, "<IFPrime>", TOKEN.content);
+            gen_instr("LABEL", -999);
         }
         else if(TOKEN.content == "else"){
             printTOKEN();
@@ -542,6 +635,7 @@ public:
                     printTOKEN();
                     TakeToken();
                     if(TOKEN.content == ";"){
+                        gen_instr("STDOUT", -999);
                         printTOKEN();
                     }else{
                         ERROR();
@@ -565,11 +659,14 @@ public:
         PrintParseInfo(OS, "<Read>", "scanf <IDs>");
         TakeToken();
         if(TOKEN.content == "scanf"){
+            gen_instr("STDIN", -999);
             printTOKEN();
             TakeToken();
             if(TOKEN.content == "("){
                 printTOKEN();
                 IDs();
+                //Memory_Location = get_address(TOKEN);
+                gen_instr("POPM", Memory_Location);
                 TakeToken();
                 if(TOKEN.content == ")"){
                     printTOKEN();
@@ -595,6 +692,8 @@ public:
         PrintParseInfo(OS, "<While>", "while( <Condition> ) <Statement>");
         TakeToken();
         if(TOKEN.content == "while"){
+            int jump_Cmd = Instr_Addr;
+            gen_instr("LABEL", -999);
             TakeToken();
             if(TOKEN.content == "("){
                 printTOKEN();
@@ -603,6 +702,8 @@ public:
                 if(TOKEN.content == ")"){
                     printTOKEN();
                     Statement();
+                    gen_instr("JUMP", jump_Cmd);
+                    back_patch(Instr_Addr);
                 }else{
                     ERROR();
                 }
@@ -628,21 +729,34 @@ public:
         TakeToken();
         PrintParseInfo(OS, "<Relop>", TOKEN.type);
         printTOKEN();
-        /*
-         if(TOKEN.content == "="){
-         return;
-         }else if(TOKEN.content == "/="){
-         return;
-         }else if(TOKEN.content == ">"){
-         return;
-         }else if(TOKEN.content == "<"){
-         return;
-         }else if(TOKEN.content == "=>"){
-         return;
-         }else if(TOKEN.content == "<="){
-         return;
-         }
-         */
+        
+        if(TOKEN.content == "="){
+            gen_instr("EQU", -999);
+            jumpstack.push(Instr_Addr);
+            gen_instr("JUMPZ", -999);
+        }else if(TOKEN.content == "/="){
+            gen_instr("NEQ", -999);
+            jumpstack.push(Instr_Addr);
+            gen_instr("JUMPZ", -999);
+        }else if(TOKEN.content == ">"){
+            gen_instr("GRT", -999);
+            jumpstack.push(Instr_Addr);
+            gen_instr("JUMPZ", -999);
+        }else if(TOKEN.content == "<"){
+            gen_instr("LES", -999);
+            jumpstack.push(Instr_Addr);
+            gen_instr("JUMPZ", -999);
+        }else if(TOKEN.content == "=>"){
+            gen_instr("GRE", -999);
+            jumpstack.push(Instr_Addr);
+            gen_instr("JUMPZ", -999);
+        }else if(TOKEN.content == "<="){
+            gen_instr("LEE", -999);
+            jumpstack.push(Instr_Addr);
+            gen_instr("JUMPZ", -999);
+        }
+        
+     
         
     }
     
@@ -655,10 +769,17 @@ public:
     
     void  ExpressionPrime(){
         TakeToken();
-        if(TOKEN.content == "+" ||TOKEN.content == "-" ){
+        if(TOKEN.content == "+" ){
             printTOKEN();
             PrintParseInfo(OS, "<Expression Prime>", TOKEN.content +" <Term> <Expression Prime>");
             Term();
+            gen_instr("Add", -999);
+            ExpressionPrime();
+        }else if(TOKEN.content == "-" ){
+            printTOKEN();
+            PrintParseInfo(OS, "<Expression Prime>", TOKEN.content +" <Term> <Expression Prime>");
+            Term();
+            gen_instr("SUB", -999);
             ExpressionPrime();
         }else{
             putback();
@@ -674,10 +795,17 @@ public:
     
     void  TermPrime (){
         TakeToken();
-        if(TOKEN.content == "*" ||TOKEN.content == "/" ){
+        if(TOKEN.content == "*" ){
             printTOKEN();
             PrintParseInfo(OS, "<Term Prime>", TOKEN.content+" <Factor> <Term Prime>");
             Factor();
+            gen_instr("MUL", -999);
+            TermPrime();
+        }else if(TOKEN.content == "/" ){
+            printTOKEN();
+            PrintParseInfo(OS, "<Term Prime>", TOKEN.content+" <Factor> <Term Prime>");
+            Factor();
+            gen_instr("DIV", -999);
             TermPrime();
         }else{
             putback();
@@ -700,10 +828,12 @@ public:
     
     void  Primary(){
         TakeToken();
-        
         if(TOKEN.type == "identifier"){
             putback();
             PrintParseInfo(OS, "<Primary>", "<Identifier>");
+            Memory_Location = get_address(TOKEN);
+            gen_instr("PUSHM", Memory_Location);
+            cout << Instr_Addr-1 <<"   "<< TOKEN.content<<endl;
             Identifier();
             PrimaryPrime();
         }else if(TOKEN.type == "Integer"){
@@ -750,6 +880,11 @@ public:
     void Identifier(){
         TakeToken();
         PrintParseInfo(OS, "<Identifier>", TOKEN.content);
+        if(Declarating){
+            gen_SymbolTable(TOKEN);
+        }else{
+            Memory_Location = get_address(TOKEN);
+        }
         printTOKEN();
         return;
     }

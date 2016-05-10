@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F52D0D591CDBD3D3003C8E23 /* Rules.md in Sources */ = {isa = PBXBuildFile; fileRef = F52D0D581CDBD3D3003C8E23 /* Rules.md */; };
 		F5FF2B6F1CDBCDD000732BB0 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F5FF2B6E1CDBCDD000732BB0 /* main.cpp */; };
 /* End PBXBuildFile section */
 
@@ -23,8 +24,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		F52D0D561CDBCEE2003C8E23 /* test.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
-		F52D0D571CDBCEEB003C8E23 /* result.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = result.txt; sourceTree = "<group>"; };
+		F52D0D561CDBCEE2003C8E23 /* test.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = test.txt; path = Assembly/test.txt; sourceTree = "<group>"; };
+		F52D0D571CDBCEEB003C8E23 /* result.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = result.txt; path = Assembly/result.txt; sourceTree = "<group>"; };
+		F52D0D581CDBD3D3003C8E23 /* Rules.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Rules.md; sourceTree = "<group>"; };
+		F52D0D5B1CDC2E99003C8E23 /* Assembly.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Assembly.h; sourceTree = "<group>"; };
 		F5FF2B6B1CDBCDD000732BB0 /* Assembly */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Assembly; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5FF2B6E1CDBCDD000732BB0 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		F5FF2B751CDBCE0B00732BB0 /* Rules.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Rules.h; sourceTree = "<group>"; };
@@ -42,10 +45,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F52D0D5C1CE1B14B003C8E23 /* resource */ = {
+			isa = PBXGroup;
+			children = (
+				F52D0D561CDBCEE2003C8E23 /* test.txt */,
+				F52D0D571CDBCEEB003C8E23 /* result.txt */,
+				F52D0D581CDBD3D3003C8E23 /* Rules.md */,
+			);
+			name = resource;
+			sourceTree = "<group>";
+		};
 		F5FF2B621CDBCDD000732BB0 = {
 			isa = PBXGroup;
 			children = (
 				F5FF2B6D1CDBCDD000732BB0 /* Assembly */,
+				F52D0D5C1CE1B14B003C8E23 /* resource */,
 				F5FF2B6C1CDBCDD000732BB0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,11 +75,10 @@
 		F5FF2B6D1CDBCDD000732BB0 /* Assembly */ = {
 			isa = PBXGroup;
 			children = (
-				F5FF2B6E1CDBCDD000732BB0 /* main.cpp */,
+				F52D0D5B1CDC2E99003C8E23 /* Assembly.h */,
 				F5FF2B751CDBCE0B00732BB0 /* Rules.h */,
 				F5FF2B761CDBCE1900732BB0 /* lexer.h */,
-				F52D0D561CDBCEE2003C8E23 /* test.txt */,
-				F52D0D571CDBCEEB003C8E23 /* result.txt */,
+				F5FF2B6E1CDBCDD000732BB0 /* main.cpp */,
 			);
 			path = Assembly;
 			sourceTree = "<group>";
@@ -126,6 +139,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F52D0D591CDBD3D3003C8E23 /* Rules.md in Sources */,
 				F5FF2B6F1CDBCDD000732BB0 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
